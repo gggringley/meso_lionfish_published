@@ -1,0 +1,89 @@
+---
+title: "heatmap_final"
+author: "GG"
+date: "1/28/2019"
+output: 
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+Loading Libraries
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(dbplyr)
+```
+
+Input datafile from computer
+```{r}
+heatmap <- read_csv("~/Desktop/Lionfish/Heatmap data.csv")
+```
+
+plot data
+
+```{r}
+ggplot(data = heatmap, aes(x = site, y = species)) + geom_tile(aes(fill = mean))
+```
+
+```{r}
+ggplot(data = heatmap, aes(x = site, y = species)) + geom_tile(aes(fill = mean), color = "white") +
+  scale_fill_gradient(low = "white", high = "darkred") +
+  ylab("Species") +
+  xlab("") +  
+  theme(legend.title = element_text(size = 10),
+        legend.text = element_text(size = 12),
+        plot.title = element_text(size=16),
+        axis.title=element_text(size=14,face="bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1)) +
+  labs(fill = "Percent")
+```
+
+```{r}
+ggplot(data = heatmap, aes(x = site, y = species)) + geom_tile(aes(y = reorder(species, mean, median, order = TRUE), fill = mean), color = "white") +
+  scale_fill_gradient(low = "white", high = "darkblue") +
+  ylab ("Species") +
+  xlab("") +  
+  theme(legend.title = element_text(size = 10),
+        legend.text = element_text(size = 12),
+        plot.title = element_text(size=16),
+        axis.title=element_text(size=14,face="bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+axis.text.y=element_text(face="italic")) +
+  labs(fill = "Percent")
+```
+
+```{r}
+heatmap_plot_red <- ggplot(data = heatmap, aes(x = site, y = species)) + geom_tile(aes(y = reorder(species, mean, median, order = TRUE), fill = mean), color = "white") +
+  scale_fill_gradient(low = "white", high = "darkred") +
+  ylab ("Species") +
+  xlab("") +  
+  theme(legend.title = element_text(size = 10),
+        legend.text = element_text(size = 12),
+        plot.title = element_text(size=16),
+        axis.title=element_text(size=14,face="bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+axis.text.y=element_text(face="italic")) +
+  labs(fill = "Percent")
+heatmap_plot_red
+```
+
+
+```{r}
+heatmap_plot_red <- ggplot(data = heatmap, aes(x = site, y = species)) + geom_tile(aes(y = reorder(species, mean, median, order = TRUE), fill = mean), color = "white") +
+  scale_fill_gradient(low = "white", high = "red") +
+  ylab ("Species") +
+  xlab("") +  
+  theme(legend.title = element_text(size = 10),
+        legend.text = element_text(size = 12),
+        plot.title = element_text(size=16),
+        axis.title=element_text(size=14,face="bold"),
+        axis.text.x = element_text(angle = 45, hjust = 1),
+axis.text.y=element_text(face="italic")) +
+  labs(fill = "Percent")
+heatmap_plot_red
+ggsave(heatmap, plot = heatmap_plot_red, device = "eps")
+```
+
+```
