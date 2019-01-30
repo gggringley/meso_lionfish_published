@@ -1,0 +1,64 @@
+---
+title: "Lionfish Cluster Plot"
+author: "GG"
+date: "1/28/2019"
+output: 
+ word_document: default
+ pdf_document: default
+ html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+library(vegan)
+library(dbplyr)
+library(tidyverse)
+```
+```{r}
+PCA_fish <- read_csv("~/Desktop/Lionfish/Darwin_matrix.csv")
+```
+
+```{r}
+library(tidyverse)
+row.names(PCA_fish) <- PCA_fish$X1
+PCA_fish[1] = NULL
+```
+
+K means cluster analysis
+```{r}
+library(tidyverse)  # data manipulation
+library(cluster)    # clustering algorithms
+library(factoextra)
+```
+
+
+```{r}
+library(ggplot2)
+cluster2 <- kmeans(PCA_fish, centers = 2, nstart = 25)
+str(cluster2)
+pcaplot <- fviz_cluster(cluster2, data = PCA_fish, fill = "darkblue") + ylim(-2.5,4.5) + theme_classic()
+ggsave(PCA_fish, plot = pcaplot, device = "eps")
+pcaplot
+```
+
+
+```{r}
+ggpcaplot <- pcaplot + theme_classic() + labs(title="")
+ggpcaplot
+ggsave(PCA_fish, plot = ggpcaplot, device = "eps")
+```
+```{r}
+cluster3 <- kmeans(PCA_fish, centers = 3, nstart = 25)
+str(cluster3)
+fviz_cluster(cluster3, data = PCA_fish, fill = "darkblue") + ylim(-2.5,4.5) + theme_classic()
+```
+
+```{r}
+citation(package = "vegan")
+citation(package = "tidyverse")
+citation(package = "ggplot2")
+```
+
