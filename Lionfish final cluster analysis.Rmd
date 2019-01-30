@@ -50,15 +50,5 @@ ggpcaplot <- pcaplot + theme_classic() + labs(title="")
 ggpcaplot
 ggsave(PCA_fish, plot = ggpcaplot, device = "eps")
 ```
-```{r}
-cluster3 <- kmeans(PCA_fish, centers = 3, nstart = 25)
-str(cluster3)
-fviz_cluster(cluster3, data = PCA_fish, fill = "darkblue") + ylim(-2.5,4.5) + theme_classic()
-```
 
-```{r}
-citation(package = "vegan")
-citation(package = "tidyverse")
-citation(package = "ggplot2")
-```
 
