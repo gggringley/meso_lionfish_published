@@ -1,0 +1,58 @@
+---
+title: "Correlation_matrix"
+author: "GG"
+date: "1/28/2019"
+output:
+  pdf_document: default
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Darwin Correlation Analyses
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(dbplyr)
+```
+Throughout this code I reference my computer desktop for reading and saving files, however the data files are available in github and can be accessed with a quick modification to the code.
+```{r}
+darwin <- read_csv("~/Documents/darwin_stats2.csv")
+```
+Creating a correlation matrix
+
+```{r}
+corr <- round(cor(darwin), 1)
+```
+
+```{r}
+library(ggcorrplot)
+corr <- round(cor(darwin), 1)
+```
+```{r}
+p.mat <- cor_pmat(darwin)
+p.mat
+
+```
+
+This figure includes the r values. These values can be removed by elimiating the lab = TRUE assignment
+```{r}
+darwin_corr <- ggcorrplot(corr, hc.order = TRUE, 
+           type = "lower", 
+           lab = TRUE, 
+           lab_size = 3, outline.col = "white",
+           p.mat = p.mat,
+           title="Correlogram of Lionfish Density", 
+           colors = c("darkblue", "white", "red"),
+           ggtheme=theme_bw)
+darwin_corr
+ggsave(darwin, plot = darwin_corr, device = "eps", path = "~/Desktop/Lionfish")
+```
+
+
+
+
