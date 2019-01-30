@@ -1,0 +1,138 @@
+---
+title: "lionfish_GLM"
+author: "GG"
+date: "12/17/2018"
+output:
+  html_document: default
+  word_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+```{r}
+library(ggplot2)
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(dbplyr)
+```
+
+```{r}
+darwin <- read_csv("~/Documents/darwin_stats2.csv")
+```
+
+```{r}
+library(vegan)
+```
+
+Visualizing the GLM resutls with a PCA analysis
+```{r}
+# remove unwanted variables 
+darwin.pca <- darwin[, 2:8]
+darwin.pca[6] = NULL
+darwin.pca[5] = NULL
+darwin.den <- (darwin[, 1] +1)
+ 
+# apply PCA - scale. = TRUE is highly 
+# advisable, but default is FALSE. 
+pca <- prcomp(darwin.pca,
+                 center = TRUE,
+                 scale. = TRUE) 
+```
+
+```{r}
+# print method
+print(pca)
+```
+
+In order to create the biplot we need devtools and ggbiplot available from CRAN and github
+
+```{r}
+library(devtools)
+library(ggbiplot)
+library(ggfortify)
+```
+
+
+```{r}
+d.factanal2 <- factanal(darwin.pca, factors = 2, scores = 'regression')
+pca.plot2 <- autoplot(d.factanal2, data = darwin, colour = 'lionfish_den', size = 4,
+         loadings = TRUE, loadings.label = TRUE, loadings.label.size  = 5) + theme_classic()
+pca.plot2
+```
+```{r}
+ggsave(darwin, plot = pca.plot2, device = "eps", path = "~/Desktop/Lionfish")
+```
+
+NOW FOR THE GLM
+
+GLM model with all variables included showing covariance among possible drivers. 
+```{r}
+scale((darwin[,2:8]), center = TRUE, scale = TRUE)
+fit3 <- glm((lionfish_den + 1)~fish_bio+fish_den+p_furc+fish_div+temp, data=darwin, family = Gamma())
+summary(fit3)
+```
+Testing covairance
+```{r}
+library(car)
+sqrt(vif(fit3))
+```
+*using Gamma distribution as this model results in the most "normal" data, see plots below of model fits*  
+```{r}
+scale((darwin[,2:8]), center = TRUE, scale = TRUE)
+fit_bio <- glm((lionfish_den + 1)~fish_bio, data=darwin, family = Gamma)
+fit_den <- glm((lionfish_den + 1)~fish_den, data=darwin, family = Gamma)
+fit_div <- glm((lionfish_den + 1)~fish_div, data=darwin,family = Gamma, start = c(0.5, 0.5))
+fit_pfur <- glm((lionfish_den + 1)~p_furc, data=darwin,family = Gamma)
+fit_temp <- glm((lionfish_den + 1)~temp, data=darwin, family = Gamma)
+AIC(fit_bio, fit_den, fit_pfur, fit_temp, fit_div)
+coef(fit_bio, fit_den, fit_pfur, fit_temp, fit_div)
+summary(fit_bio)
+summary(fit_den)
+summary(fit_div)
+summary(fit_pfur)
+summary(fit_temp)
+```
+
+```{r}
+hist(resid(fit_temp))
+qqnorm(resid(fit_temp))
+qqline(resid(fit_temp))
+```
+
+```{r}
+hist(resid(fit_den))
+qqnorm(resid(fit_den))
+qqline(resid(fit_den))
+```
+
+```{r}
+hist(resid(fit_div))
+qqnorm(resid(fit_div))
+qqline(resid(fit_div))
+```
+
+```{r}
+hist(resid(fit_bio))
+qqnorm(resid(fit_bio))
+qqline(resid(fit_bio))
+```
+
+```{r}
+hist(resid(fit_pfur))
+qqnorm(resid(fit_pfur))
+qqline(resid(fit_pfur))
+```
+
+```{r}
+coef(fit_bio)
+coef(fit_pfur) 
+coef(fit_temp) 
+coef(fit_div)
+coef(fit_den)
+```
